@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:validation="http://www.mulesoft.org/schema/mule/validation" xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd
+http://www.mulesoft.org/schema/mule/validation http://www.mulesoft.org/schema/mule/validation/current/mule-validation.xsd">
+	<validation:config name="Validation_Config" doc:name="Validation Config" doc:id="4cb96f3b-dcfc-4e9c-bb1c-1f103390a388" />
+	<flow name="post-members-transactions-implFlow" doc:id="9c206ee1-f2df-4fed-9dff-1530f540402f" >
+		<ee:transform doc:name="Transform Message" doc:id="d22ae533-c4c3-4bb0-a688-69c0ba9c3be0" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+[{
+	"memberId__c": vars.requestPayload.memberId,
+	"transactionId__c": vars.requestPayload.txnId,
+	"amount__c": vars.requestPayload.amount,
+	"memberTier__c": vars.requestPayload.memberTier,
+	"transactionDate__c": vars.requestPayload.txnDate as Date{format: "dd-MM-yyyy"}
+}]]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Before Salesforce Create Logger" doc:id="edf3580d-ac27-42ce-9dda-cfb9db8d165b" message="#[payload]"/>
+		<salesforce:create doc:name="Create" doc:id="21858fee-25b3-460d-b51e-a416f68ff6b8" config-ref="Salesforce_Config" type="Transaction__kav">
+		</salesforce:create>
+		<logger level="INFO" doc:name="After Salesforce Create Logger" doc:id="89401303-8842-48dc-9278-f008fe4e1c04" message="#[payload]"/>
+		<validation:is-true doc:name="is Salesforce Operation Successfull?" doc:id="783be0e8-acfa-493b-b7c7-a030889b193a" expression="#[vars.sfdcCreateResponse.successful]" config-ref="Validation_Config" message="Creation of transaction  record in Salesforce is unscessful due to invalid data type"/>
+		<ee:transform doc:name="Final Response Transformation" doc:id="5122bda6-beaa-4857-b04c-f029e800179a" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+  message: "transaction created successfully",
+  statusCode: 201,
+  txnSuccess: true,
+  eventId: " abcdefgh-jxbv8599-sjdf76432-3746bbdd ",
+  data: {
+    memberId: "Mdsah8734873",
+    txnStatus: "Success"
+  }
+} as Object {encoding: "UTF-8", mediaType: "application/json"}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>

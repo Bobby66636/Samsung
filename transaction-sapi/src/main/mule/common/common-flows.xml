@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<sub-flow name="initialize-variables-sub-flow" doc:id="a878d3f2-d728-4727-8c6f-8eb87d590b99" >
+		<ee:transform doc:name="Create initial variables" doc:id="1a207f71-165c-4db1-93d5-a0ab211e8245">
+			<ee:message>
+			</ee:message>
+			<ee:variables>
+				<ee:set-variable variableName="requestPayload"><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-variable>
+				<ee:set-variable variableName="queryParams"><![CDATA[attributes.queryParams default ""]]></ee:set-variable>
+				<ee:set-variable variableName="uriParams"><![CDATA[attributes.uriParams default ""]]></ee:set-variable>
+				<ee:set-variable variableName="headers"><![CDATA[attributes.headers]]></ee:set-variable>
+				<ee:set-variable variableName="startTime"><![CDATA[now()]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+	</sub-flow>
+</mule>

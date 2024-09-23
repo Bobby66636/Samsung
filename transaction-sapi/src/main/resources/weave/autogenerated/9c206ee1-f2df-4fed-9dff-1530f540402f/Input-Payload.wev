@@ -1,0 +1,11 @@
+%dw 2.0
+
+type auto_9c206ee1_f2df_4fed_9dff_1530f540402f_Input_Payload = {
+  amount: Number, 
+  memberTier: "T4" | "T1" | "T2" | "T3", 
+  txnDate: String, 
+  memberId: String, 
+  txnId: String, 
+  _?: Any
+}
+

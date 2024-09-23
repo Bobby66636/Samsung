@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:secure-properties="http://www.mulesoft.org/schema/mule/secure-properties"
+	xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce"
+	xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd 
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd
+http://www.mulesoft.org/schema/mule/secure-properties http://www.mulesoft.org/schema/mule/secure-properties/current/mule-secure-properties.xsd">
+    <http:listener-config name="transaction-sapi-httpListenerConfig">
+        <http:listener-connection host="${secure::http.listener.host}" port="${secure::http.listener.port}" />
+    </http:listener-config>
+    <apikit:config name="transaction-sapi-config" api="resource::77a279c7-df4a-4fe0-9859-72bce2f38629:transaction-sapi:1.0.0:raml:zip:transaction-sapi.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
+	<http:request-config name="HTTP_Request_configuration1" doc:name="HTTP Request configuration" doc:id="4559ae23-883d-4119-8f9e-2e85c1522aec" />
+	<salesforce:sfdc-config name="Salesforce_Config" doc:name="Salesforce Config" doc:id="24c003ae-a93d-4147-8c7f-a090d9faef4f" >
+		<salesforce:basic-connection username="${secure::salesforce.username}" password="${secure::salesforce.password}" securityToken="${secure::salesforce.token}" />
+	</salesforce:sfdc-config>
+	<configuration-properties doc:name="Configuration properties" doc:id="983c62f2-10ec-484c-9e88-5fe74860ef09" file="config/${mule.env}" />
+	<secure-properties:config name="Secure_Properties_Config" doc:name="Secure Properties Config" doc:id="096fa689-ca15-4597-9f33-4969b7b7a4c3" file="config/${mule.env}" key="${secure.key}"/>
+	<global-property doc:name="Global Property" doc:id="58e042a9-bac0-4a52-8ec1-6744119f13fd" name="mule.env" value="dev.yaml" />
+	<global-property doc:name="Global Property" doc:id="a5bf8fad-771c-4b32-b44d-37295ca3196e" name="secure.key" value="ABCD1234EFGH5678" />
+</mule>

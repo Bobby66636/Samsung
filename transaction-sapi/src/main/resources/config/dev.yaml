@@ -1,0 +1,24 @@
+##### http listner configuration Details #####
+
+http:
+   listener:
+     host: "0.0.0.0"
+     port: "8085"
+     path: "/api/*"
+ #    keystore:
+ #   path: "certs/server-keystore.jks"
+ #   aliasName: "mule-server"
+       
+##### Salesforce Config Details #####       
+  
+salesforce:
+  username: "bobby66636-sxvk@force.com"
+  password: "![kWYzRH0IO9zcwaQmlbm0sg==]"
+  token: "![OdEukvdff9dhAnWdg5J8S8TRmo8LTHJQSvbn7QaG3f8=]"
+  frequency: "2000"
+  attempts: "3"
+  
+##### API ID Details #####
+
+api.id: ""    
+                  

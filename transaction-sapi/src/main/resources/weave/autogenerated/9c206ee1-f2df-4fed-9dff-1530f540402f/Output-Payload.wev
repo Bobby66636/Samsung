@@ -1,0 +1,15 @@
+%dw 2.0
+
+type auto_9c206ee1_f2df_4fed_9dff_1530f540402f_Output_Payload = {
+  eventId: String, 
+  txnSuccess: Boolean, 
+  data: {
+    txnStatus: String, 
+    memberId: String, 
+    _?: Any
+  } {"description": "This object contains the Member ID and Transaction Status of a specific transaction."}, 
+  message: String, 
+  statusCode: Number, 
+  _?: Any
+}
+

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd ">
+
+    <http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="fcda2b18-fb6c-49f3-9e91-1bf59e2ce1fe" />
+	<flow name="transaction-sapi-main">
+        <http:listener config-ref="transaction-sapi-httpListenerConfig" path="${http.listener.path}">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body><![CDATA[#[payload]]]></http:body>
+                <http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
+            </http:error-response>
+        </http:listener>
+		<flow-ref doc:name="Flow Reference to initialize-variables-sub-flow" doc:id="efac7115-816e-41fc-84be-f47918187ba9" name="initialize-variables-sub-flow" />
+		<apikit:router config-ref="transaction-sapi-config" />
+		<error-handler ref="common-error-handler" />
+        
+    </flow>
+    <flow name="transaction-sapi-console">
+        <http:listener config-ref="transaction-sapi-httpListenerConfig" path="/console/*">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body>#[payload]</http:body>
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:error-response>
+        </http:listener>
+        <apikit:console config-ref="transaction-sapi-config" />
+        <error-handler>
+            <on-error-propagate type="APIKIT:NOT_FOUND">
+                <ee:transform doc:name="Transform Message">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Resource not found"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">404</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+        </error-handler>
+    </flow>
+    <flow name="post:\members\transcations:application\json:transaction-sapi-config">
+		<logger level="INFO" doc:name="Start Logger" doc:id="cbbcce58-24ca-4a2f-8d2a-db7a1f5872db" message="#[%dw 2.0&#10;output application/json indent = false&#10;---&#10;{&#10;	&quot;applicationName&quot; : app.name,&#10;	&quot;flowName&quot;: flow.name,&#10;	&quot;source&quot;: &quot;front-end&quot;,&#10;	&quot;destination&quot;: &quot;SFDC&quot;,&#10;	&quot;transactionId&quot;: vars.headers.'x-transaction-id',&#10;	&quot;memberId&quot;: vars.requestPayload.memberId,&#10;	&quot;startTime&quot;: vars.startTime,&#10;	&quot;tracePoint&quot;: &quot;START&quot;,&#10;	&quot;message&quot;: &quot;post members transaction flow started&quot;&#10;	&#10;	}]"/>
+		<flow-ref doc:name="Flow Reference" doc:id="24dc9aaf-b093-423f-a6b7-536b7cfeabd3" name="post-members-transactions-implFlow"/>
+		<logger level="INFO" doc:name="End Logger" doc:id="bbee01f5-c844-402e-9375-3b34f8213765" message="#[%dw 2.0&#10;output application/json indent = false&#10;---&#10;{&#10;	&quot;applicationName&quot; : app.name,&#10;	&quot;flowName&quot;: flow.name,&#10;	&quot;source&quot;: &quot;front-end&quot;,&#10;	&quot;destination&quot;: &quot;SFDC&quot;,&#10;	&quot;transactionId&quot;: vars.headers.'x-transaction-id',&#10;	&quot;memberId&quot;: vars.requestPayload.memberId,&#10;	&quot;endTime&quot;: now(),&#10;	&quot;tracePoint&quot;: &quot;END&quot;,&#10;	&quot;message&quot;: &quot;post members transaction flow completed successfully&quot;&#10;	&#10;	}]"/>
+    </flow>
+</mule>
